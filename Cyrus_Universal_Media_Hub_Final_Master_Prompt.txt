@@ -1,0 +1,2355 @@
+CYRUS UNIVERSAL MEDIA HUB
+FINAL MASTER PROMPT — PRODUCTION-GRADE UNIVERSAL MEDIA DOWNLOADER + MULTI-PROVIDER API PLATFORM
+
+You are a senior full-stack architect, backend engineer, frontend engineer, API integration engineer, security engineer, DevOps engineer, and QA engineer.
+
+Build a complete production-ready web application named:
+
+CYRUS UNIVERSAL MEDIA HUB
+
+The application is a powerful universal media URL analyzer and downloader that allows a user to paste a publicly accessible or authorized media URL and receive the media metadata, available formats, quality information, and a genuine downloadable file whenever the source and applicable provider legally permit access.
+
+The application must NOT be a fake frontend, mockup, proof of concept, or static demonstration.
+
+Everything that is implemented must be connected to real backend logic.
+
+Do not create buttons that do nothing.
+Do not display fake download progress.
+Do not generate fake URLs.
+Do not claim a platform is supported unless its integration has actually been implemented and tested.
+
+The architecture must be extensible so that hundreds of legitimate providers can be added without rewriting the entire application.
+
+1. CORE OBJECTIVE
+
+Create one universal application that provides:
+- Universal URL detection
+- Automatic platform detection
+- Direct-media URL detection
+- Metadata extraction
+- Thumbnail extraction
+- Duration detection
+- Author/channel information
+- Available quality detection
+- Format detection
+- Real download processing
+- Browser-compatible downloads
+- Large-file download handling
+- Resumable downloads where technically supported
+- Download history
+- Queue management
+- Download cancellation
+- Automatic provider selection
+- Provider fallback
+- Provider health monitoring
+- API-key management
+- Provider configuration
+- Rate-limit awareness
+- Provider priority management
+- Admin dashboard
+- User dashboard
+- Download statistics
+- Error reporting
+- System diagnostics
+- Provider testing
+- Secure URL fetching
+- SSRF protection
+- Abuse protection
+- Logging
+- Caching
+- Scalable architecture
+
+The application must be designed around a central provider abstraction.
+
+2. IMPORTANT REAL-WORLD RULE
+
+Do NOT promise that every website on the internet can always be downloaded.
+
+The system must support:
+1. Publicly accessible media
+2. Media where the user has authorization to download it
+3. Official platform APIs
+4. Public/open media APIs
+5. Direct media files
+6. Accessible non-DRM media streams
+7. Sources explicitly supported by a working adapter
+
+The application must NOT attempt to:
+- bypass DRM
+- bypass authentication
+- access private accounts
+- steal or reuse session cookies
+- circumvent paywalls
+- circumvent CAPTCHA
+- bypass access controls
+- defeat anti-bot protections
+- download content that the user is not authorized to access
+- impersonate a user
+- evade platform security restrictions
+
+When a source cannot legally or technically be resolved, return a clear explanation instead of pretending the download succeeded.
+
+3. NO FAKE IMPLEMENTATION
+
+The following are prohibited:
+- Mock API responses in production mode
+- Hardcoded fake download URLs
+- Fake progress percentages
+- Fake file sizes
+- Fake provider success
+- Fake API health status
+- Placeholder buttons
+- "Coming soon" functionality disguised as completed functionality
+- Randomly generated metadata
+- Simulated download completion
+- Hardcoded secret credentials
+- Static provider responses pretending to be live
+
+Development mocks may exist only inside a clearly isolated test environment.
+
+4. PROJECT ARCHITECTURE
+
+Use a modular architecture.
+
+Recommended stack:
+
+Frontend:
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Accessible component system
+- Responsive design
+
+Backend:
+- TypeScript
+- Node.js
+- REST API
+- WebSocket or Server-Sent Events for live job progress
+
+Database:
+- PostgreSQL
+- Supabase PostgreSQL is acceptable
+
+Caching:
+- Redis-compatible cache
+
+Storage:
+- S3-compatible object storage or configurable local storage
+
+Background processing:
+- Worker/queue architecture
+
+Deployment:
+- Docker support
+- VPS support
+- Cloud/container deployment support
+- Frontend deployment support where compatible
+
+Do not make the architecture dependent on a single hosting company.
+
+5. HIGH-LEVEL SYSTEM
+
+USER
+  |
+  v
+WEB APPLICATION
+  |
+  v
+URL ANALYZER
+  |
+  +--> Direct Media Detector
+  |
+  +--> Platform Detector
+  |
+  v
+PROVIDER REGISTRY
+  |
+  +--> Provider A
+  +--> Provider B
+  +--> Provider C
+  |
+  v
+METADATA RESOLVER
+  |
+  v
+MEDIA RESOLVER
+  |
+  v
+FORMAT/QUALITY LIST
+  |
+  v
+DOWNLOAD JOB
+  |
+  v
+JOB WORKER
+  |
+  v
+STORAGE / STREAM
+  |
+  v
+USER DOWNLOAD
+
+6. UNIVERSAL INPUT SYSTEM
+
+Main interface must have a highly visible URL field.
+
+Example:
+Paste video, audio or media URL
+[ https://example.com/media/... ]
+[ Analyze ]
+
+Support:
+- Paste
+- Keyboard entry
+- Mobile paste
+- Clipboard integration where browser permissions permit it
+- Drag-and-drop URLs where supported
+- Multiple URLs
+- Batch URL processing
+- URL history
+- Clear button
+- Analyze button
+
+Accept HTTP and HTTPS.
+
+Reject:
+- malformed URLs
+- unsupported protocols
+- dangerous internal addresses
+- localhost targets
+- private network targets
+- cloud metadata endpoints
+- invalid ports
+- unsafe redirect chains
+
+7. URL DETECTION ENGINE
+
+Build a dedicated URL detection service.
+
+Responsibilities:
+- Normalize URL
+- Remove unnecessary tracking parameters when safe
+- Preserve required parameters
+- Detect hostname
+- Detect platform
+- Detect direct media extension
+- Detect known media hosting patterns
+- Identify supported provider adapter
+- Identify whether URL is already a direct media resource
+- Detect duplicate URLs
+- Generate a canonical URL
+- Perform secure redirects
+
+8. PLATFORM ADAPTER SYSTEM
+
+Never hardcode all platforms into one massive function.
+
+Create an adapter interface.
+
+Example conceptual interface:
+
+interface MediaProvider {
+    id: string;
+    name: string;
+    category: string;
+
+    supports(url: URL): Promise<boolean>;
+
+    getCapabilities(): ProviderCapabilities;
+
+    resolveMetadata(
+        request: ResolveRequest
+    ): Promise<MetadataResult>;
+
+    resolveMedia(
+        request: MediaResolveRequest
+    ): Promise<MediaResult>;
+
+    healthCheck(): Promise<HealthResult>;
+}
+
+Every provider must implement the same contract.
+
+Capabilities may include:
+- metadata
+- thumbnail
+- duration
+- author
+- formats
+- qualities
+- audio
+- video
+- directFile
+- stream
+- download
+- batch
+- authenticatedAuthorizedAccess
+
+Only advertise capabilities that the provider actually supports.
+
+9. PROVIDER REGISTRY
+
+Create a central registry:
+
+providers/
+    core/
+    direct/
+    official/
+    open/
+    public/
+    platform/
+    metadata/
+    fallback/
+
+Each provider must have:
+- provider ID
+- display name
+- description
+- category
+- supported domains
+- API base URL
+- authentication type
+- API key fields
+- documentation URL
+- pricing classification
+- rate limits
+- supported operations
+- priority
+- enabled status
+- health status
+- last successful request
+- last failed request
+- failure count
+- latency
+- version
+
+10. MULTI-PROVIDER ENGINE
+
+The application must support multiple providers for the same platform or operation.
+
+If a provider fails, the router should try another compatible provider, subject to policy and retry rules.
+
+Use intelligent provider selection based on:
+- Provider availability
+- Provider health
+- Success rate
+- Latency
+- Rate-limit status
+- Supported operation
+- Platform compatibility
+- Configured priority
+- Recent failures
+- Cost/free tier information
+
+Example scoring:
+score =
+    capability_score
+  + health_score
+  + priority_score
+  + reliability_score
+  - failure_penalty
+  - latency_penalty
+  - rate_limit_penalty
+
+11. AUTOMATIC FALLBACK
+
+If a provider fails:
+1. Record failure
+2. Identify failure category
+3. Decide whether retry is appropriate
+4. Try another compatible provider
+5. Avoid infinite loops
+6. Return the final result with an understandable diagnostic message
+
+Failure categories:
+- TIMEOUT
+- NETWORK_ERROR
+- AUTH_ERROR
+- RATE_LIMITED
+- UNSUPPORTED
+- INVALID_URL
+- SOURCE_UNAVAILABLE
+- PROVIDER_ERROR
+- FORMAT_UNAVAILABLE
+- SERVER_ERROR
+- POLICY_RESTRICTED
+- UNKNOWN
+
+Never retry indefinitely.
+
+12. API PROVIDER HUB
+
+Build an administrator-only Provider Hub.
+
+It must support a very large provider ecosystem.
+
+The architecture must permit:
+- Open-source APIs
+- Free APIs
+- Public APIs
+- Official APIs
+- Self-hosted APIs
+- Community APIs
+- Metadata APIs
+- Media APIs
+- Search APIs
+- Thumbnail APIs
+- Storage APIs
+- URL-analysis APIs
+
+Do not assume that every third-party API can download media.
+
+Each provider must be categorized by actual capability.
+
+13. PROVIDER CATEGORIES
+
+Create categories such as:
+- Official Platform APIs
+- Public Media APIs
+- Open-Source APIs
+- Self-Hosted APIs
+- Metadata APIs
+- Media Resolution APIs
+- Direct Media Services
+- Image/Thumbnail APIs
+- Video Information APIs
+- Audio Information APIs
+- Open Media Archives
+- Public-Domain Media Sources
+- Developer APIs
+- Search/Discovery APIs
+- Fallback Services
+
+Do not classify a provider as a downloader unless it really performs that function.
+
+14. PROVIDER KEY MANAGEMENT
+
+Admin dashboard must allow:
+- Add Provider
+- Edit Provider
+- Delete Provider
+- Enable Provider
+- Disable Provider
+- Test Provider
+- Rotate API Key
+- View Health
+- View Usage
+- Set Priority
+- Set Rate Limit
+- Set Timeout
+- Set Retry Count
+- Set Per-Minute Limit
+- Set Daily Limit
+- Set Monthly Limit
+
+Credential fields can include:
+- API Key
+- API Secret
+- Bearer Token
+- Client ID
+- Client Secret
+- Custom Header
+- Custom Query Parameter
+- Username
+- Password
+- OAuth credentials
+
+Never expose secrets to normal users.
+Never send secret API keys to the browser unless a provider explicitly requires a safe public key.
+Store sensitive credentials encrypted at rest.
+
+15. SECRET MANAGEMENT
+
+Implement:
+- Environment variables
+- Encrypted database secrets
+- Secret rotation support
+- Redacted logs
+- No secret exposure in API responses
+- No secret exposure in client-side JavaScript
+- No secret exposure in errors
+
+Never commit .env, API keys, service-account files, private tokens, or credentials.
+
+Provide .env.example with dummy names only.
+
+16. PROVIDER HEALTH SYSTEM
+
+Create automatic health monitoring.
+
+Each provider should have:
+- Healthy
+- Degraded
+- Rate Limited
+- Authentication Error
+- Unavailable
+- Disabled
+- Unknown
+
+Maintain:
+- last_check
+- response_time
+- success_count
+- failure_count
+- success_rate
+- last_error
+- rate_limit_remaining
+- rate_limit_reset
+
+17. DIRECT MEDIA SUPPORT
+
+Detect directly accessible media URLs.
+
+Examples of possible media resources:
+- .mp4
+- .webm
+- .mov
+- .m4v
+- .mkv
+- .avi
+- .mp3
+- .m4a
+- .aac
+- .ogg
+- .opus
+- .wav
+- .flac
+
+Also recognize accessible stream manifests where supported:
+- .m3u8
+- .mpd
+
+Only process streams that are publicly accessible or authorized and do not require defeating DRM or access restrictions.
+
+18. DIRECT DOWNLOAD ENGINE
+
+Build a native download engine independent of any universal downloader framework.
+
+The engine should handle:
+- HTTP GET
+- HEAD
+- Range requests
+- Content-Length
+- Content-Type
+- Content-Disposition
+- Redirects
+- Resume
+- Partial downloads
+- Timeouts
+- Retries
+- Checksums where available
+- Streaming
+- Large files
+- Connection failure recovery
+
+Use streaming instead of loading huge files into memory.
+
+19. NO DEPENDENCY ON UNIVERSAL DOWNLOADER PACKAGES
+
+The core application must not require:
+- yt-dlp
+- youtube-dl
+- a fork of either
+- FFmpeg
+- a universal downloader SaaS
+- a proprietary downloader service
+
+The download system should use your own provider abstraction and HTTP/media handling.
+
+Do not secretly install prohibited dependencies simply to claim support.
+
+Where advanced media processing genuinely requires a separate component, clearly isolate and document it instead of pretending it is unnecessary.
+
+20. MEDIA RESOLUTION
+
+After URL analysis, return:
+- Title
+- Author
+- Platform
+- Thumbnail
+- Duration
+- Description
+- Upload information when available
+- Available media formats
+- Available quality options
+- File size when available
+- Audio availability
+- Video availability
+- Codec information when available
+
+Only display formats actually returned by the provider.
+
+21. QUALITY SELECTION
+
+Support options when available:
+- Best available
+- 2160p
+- 1440p
+- 1080p
+- 720p
+- 480p
+- 360p
+- 240p
+- Audio only
+- Original
+
+Never invent unavailable resolutions.
+
+For each option display:
+- Resolution
+- Container
+- Codec
+- Approximate size
+- Bitrate where available
+- Frame rate where available
+- Audio status
+
+22. FORMAT HANDLING
+
+Support available source formats such as:
+- MP4
+- WebM
+- MOV
+- MKV
+- M4V
+- MP3
+- M4A
+- AAC
+- OGG
+- OPUS
+- WAV
+- FLAC
+
+Do not falsely claim that a source can be converted into a format unless a real conversion implementation exists.
+
+The initial system should prioritize direct source formats.
+
+23. DOWNLOAD JOB SYSTEM
+
+Each download becomes a job.
+
+Job schema:
+- id
+- user_id
+- source_url
+- canonical_url
+- provider_id
+- status
+- title
+- thumbnail
+- format
+- quality
+- mime_type
+- file_size
+- downloaded_bytes
+- progress
+- speed
+- eta
+- storage_path
+- created_at
+- started_at
+- completed_at
+- error_code
+- error_message
+
+Statuses:
+- QUEUED
+- ANALYZING
+- RESOLVING
+- DOWNLOADING
+- PAUSED
+- COMPLETED
+- FAILED
+- CANCELLED
+- EXPIRED
+
+24. REAL-TIME PROGRESS
+
+Progress must be based on real byte information.
+
+Show:
+- Downloaded / Total
+- Speed
+- ETA
+- Status
+- Current provider
+
+If total size is unknown, show downloaded bytes and speed instead of fake percentages.
+
+25. DOWNLOAD QUEUE
+
+Support multiple simultaneous jobs.
+
+Allow:
+- Add download
+- Pause
+- Resume
+- Cancel
+- Retry
+- Delete
+- Reorder
+- Retry failed
+- Clear completed
+
+Admin-configurable concurrency with safe limits.
+
+26. BATCH DOWNLOAD
+
+Allow users to paste multiple supported URLs.
+
+Process independently. One failure must not destroy successful jobs.
+
+Display total, completed, and failed counts.
+
+27. FILE STORAGE
+
+Support configurable storage backends:
+- Local filesystem
+- S3-compatible object storage
+- Cloud object storage
+- Supabase Storage
+
+Provide a storage abstraction with upload, download, delete, exists, getSize, and createSignedUrl operations.
+
+28. TEMPORARY FILE CLEANUP
+
+Implement:
+- Temporary download expiration
+- Automatic cleanup
+- Completed-job expiration
+- Failed-job cleanup
+- Orphan-file detection
+- Storage quotas
+
+Admin can configure retention duration.
+
+29. USER ACCOUNTS
+
+Support optional user authentication:
+- Register
+- Login
+- Logout
+- Forgot password
+- Reset password
+- Session management
+- Profile
+- Download history
+- Saved providers/settings
+
+Anonymous downloads may be supported with strict rate limits.
+
+30. USER DASHBOARD
+
+Create:
+- Overview
+- Downloader
+- History
+- Active Downloads
+- Saved URLs
+- Account
+- Settings
+
+Dashboard statistics:
+- Total downloads
+- Completed
+- Failed
+- Active
+- Storage used
+- Recent downloads
+
+31. DOWNLOAD HISTORY
+
+Store:
+- Title
+- Platform
+- URL
+- Provider
+- Format
+- Quality
+- Size
+- Date
+- Status
+
+Actions:
+- Download again
+- Delete history
+- Copy URL
+- Open source
+- View details
+
+Never expose provider API secrets.
+
+32. HOME PAGE
+
+Create premium modern UI.
+
+Hero:
+"Download Media From Your URL"
+"Paste a publicly accessible or authorized media link."
+
+Include:
+- Fast analysis
+- Multiple providers
+- Quality selection
+- Real progress
+- Secure processing
+
+Do not use exaggerated claims such as "downloads absolutely everything" or "bypasses all restrictions."
+
+33. RESULT PAGE
+
+After analysis show:
+- Thumbnail
+- Title
+- Creator
+- Platform
+- Duration
+- Description
+- Available formats
+- Available qualities
+- File sizes
+- Download buttons
+
+Each format should have an individual action.
+
+34. MOBILE-FIRST DESIGN
+
+The primary design target must be mobile.
+
+Optimize for:
+- Android phones
+- iPhone
+- Small screens
+- Touch controls
+- Slow networks
+- Mobile browsers
+
+Use large touch targets, sticky download controls, responsive cards, bottom-sheet format selector, mobile navigation, and compressed API responses.
+
+35. MOBILE DOWNLOAD BEHAVIOR
+
+Browser restrictions differ across devices.
+
+The application should:
+- use standard HTTP downloads where possible
+- use Content-Disposition correctly
+- support signed temporary URLs
+- avoid keeping files in server memory
+- provide clear failure messages
+- support direct browser download when possible
+
+Do not claim the browser can bypass operating-system restrictions.
+
+36. ADMIN DASHBOARD
+
+Create an advanced admin panel containing:
+- Overview
+- Users
+- Downloads
+- Providers
+- Provider Keys
+- Provider Health
+- Provider Logs
+- API Usage
+- Rate Limits
+- Storage
+- System Logs
+- Errors
+- Jobs
+- Configuration
+- Security
+
+37. ADMIN OVERVIEW
+
+Show:
+- Users
+- Downloads today
+- Downloads this week
+- Active jobs
+- Completed jobs
+- Failed jobs
+- Provider success rate
+- Storage usage
+- API requests
+- Average download speed
+
+Add charts where useful.
+
+38. PROVIDER MANAGEMENT UI
+
+Provider table:
+- Name
+- Category
+- Enabled
+- Priority
+- Health
+- Success Rate
+- Latency
+- Requests
+- Failures
+- Rate Limit
+- Last Check
+- Actions
+
+Actions:
+- Test
+- Edit
+- Disable
+- Enable
+- Configure
+- View Logs
+- Reset Statistics
+
+39. PROVIDER TESTER
+
+Administrator can enter a test URL.
+
+System performs:
+- Provider detection
+- Provider selection
+- Metadata request
+- Media-resolution request if supported
+- Latency measurement
+- Response validation
+
+Return success/failure, provider, latency, capabilities, metadata, formats, and warnings.
+
+40. PROVIDER CAPABILITY MATRIX
+
+Display capabilities such as metadata, video, audio, direct file, streams, and batch.
+
+Populate values from actual provider configuration, not hardcoded marketing claims.
+
+41. PROVIDER ROUTING RULES
+
+Admin can configure:
+- Provider priority
+- Platform priority
+- Operation priority
+- Rate-limit thresholds
+- Timeouts
+- Retry count
+- Fallback order
+
+42. API LAYER
+
+Expose your own internal API.
+
+Example:
+POST /api/analyze
+POST /api/download
+GET /api/download/:id
+POST /api/download/:id/pause
+POST /api/download/:id/resume
+POST /api/download/:id/cancel
+DELETE /api/download/:id
+GET /api/history
+GET /api/providers
+
+Admin API:
+GET /api/admin/providers
+POST /api/admin/providers
+PATCH /api/admin/providers/:id
+DELETE /api/admin/providers/:id
+POST /api/admin/providers/:id/test
+POST /api/admin/providers/:id/health
+GET /api/admin/providers/:id/logs
+
+43. API RESPONSE STANDARD
+
+Success:
+{
+  "success": true,
+  "data": {}
+}
+
+Failure:
+{
+  "success": false,
+  "error": {
+    "code": "UNSUPPORTED_SOURCE",
+    "message": "This source is not currently supported."
+  }
+}
+
+Never return raw stack traces to users.
+
+44. GENERIC ERROR SYSTEM
+
+Create human-readable errors:
+- Invalid URL
+- Unsupported platform
+- Provider unavailable
+- Source unavailable
+- Rate limit reached
+- Required API key missing
+- Media format unavailable
+- Download failed
+- Storage unavailable
+- Network timeout
+- Unauthorized media
+- DRM-protected media
+
+For provider failure, do not reveal secret internal information.
+
+45. SECURITY
+
+Implement strict SSRF protection.
+
+Block requests to:
+- 127.0.0.0/8
+- 10.0.0.0/8
+- 172.16.0.0/12
+- 192.168.0.0/16
+- 169.254.0.0/16
+- ::1
+- fc00::/7
+- fe80::/10
+- localhost
+- internal DNS targets
+- cloud metadata addresses
+
+Validate redirects too. Do not validate only the first URL.
+
+46. REQUEST LIMITS
+
+Configure:
+- Maximum URL length
+- Maximum redirect count
+- Maximum response headers
+- Maximum metadata response
+- Maximum download size
+- Maximum concurrent jobs
+- Request timeout
+- Connection timeout
+- Idle timeout
+
+Prevent resource exhaustion.
+
+47. RATE LIMITING
+
+Implement separate rate limits for:
+- anonymous users
+- authenticated users
+- admins
+- API clients
+- provider calls
+- download creation
+- URL analysis
+
+Use Redis when available.
+
+48. ABUSE PREVENTION
+
+Detect excessive requests, rapid repeated URLs, provider abuse, IP flooding, job flooding, storage abuse, and large-file abuse.
+
+Use rate limits, temporary blocks, quotas, concurrency limits, and cooldowns.
+
+49. CACHING
+
+Cache safe metadata where appropriate.
+
+Cache keys:
+- canonical URL
+- provider
+- operation
+
+Cache metadata, thumbnail URLs, and provider capability results where permitted. Do not cache sensitive private information. Respect source/provider caching rules.
+
+50. DATABASE SCHEMA
+
+Create proper migrations.
+
+Suggested tables:
+- users
+- profiles
+- download_jobs
+- download_history
+- providers
+- provider_credentials
+- provider_health
+- provider_logs
+- provider_usage
+- provider_routes
+- storage_files
+- system_settings
+- rate_limits
+- audit_logs
+- api_clients
+
+Add timestamps, indexes, foreign keys, constraints, and unique keys where appropriate.
+
+51. DATABASE SECURITY
+
+Use least privilege, parameterized queries, Row Level Security where applicable, separate admin permissions, encrypted secrets, and audit logging.
+
+A user must never be able to retrieve another user's history or files.
+
+52. AUTHORIZATION
+
+Roles:
+- USER
+- MODERATOR
+- ADMIN
+- SUPER_ADMIN
+
+Permissions should be checked server-side.
+
+Never trust role, user_id, provider_id, storage path, or admin=true from the client.
+
+53. LOGGING
+
+Create structured logs with timestamp, request_id, user_id, provider_id, operation, duration, status, and error_code.
+
+Never log API keys, passwords, OAuth secrets, private tokens, or full authorization headers.
+
+54. OBSERVABILITY
+
+Track:
+- request count
+- error rate
+- provider success rate
+- provider latency
+- download speed
+- download failures
+- queue length
+- worker utilization
+- storage usage
+
+Allow administrators to diagnose failures.
+
+55. RETRY STRATEGY
+
+Use controlled exponential backoff for appropriate failures.
+
+Example:
+Attempt 1 → 1 second
+Attempt 2 → 2 seconds
+Attempt 3 → 4 seconds
+
+Do not retry invalid URLs, unauthorized sources, unsupported formats, policy-restricted sources, or permanent authentication errors.
+
+56. WORKER ARCHITECTURE
+
+Separate web requests from heavy download processing.
+
+Use:
+Web API → Queue → Worker 1 / Worker 2 / Worker 3
+
+This prevents long downloads from blocking normal API requests.
+
+57. WORKER STATES
+
+Worker should manage:
+- claim job
+- lock job
+- resolve provider
+- download
+- update progress
+- handle failure
+- finalize file
+- release job
+
+Prevent two workers from downloading the same job simultaneously.
+
+58. RESUMABLE DOWNLOADS
+
+Where the source server supports HTTP Range requests, support pause, resume, connection recovery, and partial file continuation.
+
+If Range is not supported, clearly indicate that resume may be unavailable.
+
+59. DOWNLOAD INTEGRITY
+
+Where possible:
+- Content-Length validation
+- Checksum validation
+- ETag validation
+- Partial-file validation
+
+Do not report success until the downloaded resource has been finalized successfully.
+
+60. FILE NAMING
+
+Generate safe names: Title.ext
+
+Sanitize special filesystem characters and prevent path traversal.
+
+61. API PROVIDER PLUGIN SDK
+
+Make it possible to add a provider through one module.
+
+Example:
+providers/custom-example/
+    manifest.json
+    index.ts
+    README.md
+
+Manifest:
+{
+  "id": "custom-example",
+  "name": "Custom Example",
+  "category": "metadata",
+  "capabilities": ["metadata"]
+}
+
+Provider adapter then implements the standard interface.
+
+62. PROVIDER MANIFEST
+
+Support:
+- id
+- name
+- version
+- author
+- homepage
+- documentation
+- domains
+- capabilities
+- authentication
+- rateLimit
+- endpoints
+- priority
+- enabled
+
+63. PROVIDER VALIDATION
+
+When installing a provider:
+- Validate manifest
+- Validate schema
+- Validate capabilities
+- Validate endpoint configuration
+- Run health test
+- Run security checks
+- Register provider
+
+Invalid providers must not enter production automatically.
+
+64. THIRD-PARTY API INTEGRATION
+
+The application must support legitimate third-party API credentials supplied by the administrator.
+
+Never bundle copied credentials.
+Never scrape private credentials.
+Never ask users for their social-media passwords.
+
+When an API requires OAuth, implement a proper OAuth flow where permitted.
+
+65. OPEN-SOURCE PROVIDER SUPPORT
+
+The architecture should support integrating compatible open-source/self-hostable services.
+
+Do not assume:
+- open source = unlimited
+- free = unlimited
+- API key = downloader
+- API = legal access to all content
+
+Each provider must have a documented capability.
+
+66. PROVIDER DISCOVERY
+
+Create an internal provider catalog.
+
+Fields:
+- Provider
+- Type
+- Repository
+- Documentation
+- Supported operations
+- Authentication
+- Rate limits
+- Status
+- Version
+- Last verified
+
+Only providers whose information is actually verified should be marked active.
+
+Do not fabricate provider repositories, API endpoints, API keys, pricing, or capabilities.
+
+67. PLATFORM SUPPORT ARCHITECTURE
+
+Allow adapters for categories such as:
+- Video platforms
+- Social platforms
+- Short-video platforms
+- Live-media platforms
+- Educational platforms
+- Open-media archives
+- Public-domain repositories
+- Image/video hosting
+- Cloud storage links
+- Generic media hosts
+- CDN-hosted files
+- Self-hosted websites
+
+The platform registry must be data-driven.
+
+68. UNKNOWN WEBSITE MODE
+
+For unknown URLs:
+- Try safe direct-resource detection
+- Check Content-Type
+- Check Content-Disposition
+- Check Content-Length
+- Follow safe redirects
+- Inspect standard media response headers
+
+If it is a direct accessible media resource, show downloadable file.
+
+Otherwise return unsupported source.
+
+Do not blindly crawl arbitrary websites.
+
+69. CONTENT-TYPE DETECTION
+
+Recognize MIME types:
+- video/mp4
+- video/webm
+- video/quicktime
+- video/x-matroska
+- audio/mpeg
+- audio/mp4
+- audio/aac
+- audio/ogg
+- audio/wav
+- audio/flac
+- application/vnd.apple.mpegurl
+- application/dash+xml
+
+Do not trust only the file extension.
+
+70. THUMBNAILS
+
+Show thumbnail, fallback thumbnail, and placeholder.
+
+Use provider metadata when available.
+
+Do not use unsafe arbitrary remote image URLs without validation.
+
+71. PREVIEW
+
+Where technically and legally appropriate, provide a preview card.
+
+Do not proxy large media through the frontend unnecessarily.
+
+Use temporary source/signed URLs where possible.
+
+72. SEARCH/IMPORT EXPERIENCE
+
+Optional enhancement:
+- Paste URL
+- Search supported public media catalogs
+- Select result
+- Analyze
+- Download
+
+Search providers must only expose content they legitimately provide.
+
+73. HISTORY UX
+
+Create a clean list with:
+- Thumbnail
+- Title
+- Platform
+- Date
+- Quality
+- Size
+- Status
+- Actions
+
+Mobile version should use cards rather than a wide table.
+
+74. SETTINGS
+
+User settings:
+- Theme
+- Default quality
+- Default format
+- Concurrent downloads
+- Auto-start downloads
+- History retention
+- Notifications
+
+Admin settings:
+- Global rate limits
+- Max file size
+- Max concurrency
+- Storage retention
+- Provider defaults
+- Worker count
+- Timeouts
+- Retry policy
+
+75. THEMING
+
+Provide:
+- Dark mode
+- Light mode
+- System mode
+
+Visual direction:
+- premium
+- clean
+- modern
+- fast
+- professional
+- minimal
+- high contrast
+- mobile friendly
+
+Brand:
+CYRUSLINKSHUB
+Cyrus Universal Media Hub
+
+Avoid copying the exact visual design of another commercial application.
+
+76. ACCESSIBILITY
+
+Support keyboard navigation, screen readers, ARIA labels, focus states, contrast, reduced motion, and large touch targets.
+
+77. PERFORMANCE
+
+Optimize lazy loading, image optimization, streaming responses, pagination, caching, database indexes, connection pooling, worker queues, and API response sizes.
+
+Never download an entire large file into server RAM.
+
+78. SCALABILITY
+
+Architecture must permit 1, 10, or 100 workers without changing the frontend.
+
+Providers must remain independently configurable. Storage must be replaceable. Database must be replaceable within supported adapters.
+
+79. API CLIENT SYSTEM
+
+Optionally provide developer API access.
+
+Admin can create:
+- API client
+- client ID
+- client secret
+- permissions
+- rate limit
+- quota
+- status
+
+API users may access analyze, metadata, download-job status, and provider capabilities.
+
+Only expose functionality that is safe and authorized.
+
+80. DOCUMENTATION
+
+Generate:
+- README.md
+- INSTALLATION.md
+- CONFIGURATION.md
+- PROVIDER_DEVELOPMENT.md
+- API.md
+- SECURITY.md
+- DEPLOYMENT.md
+- TROUBLESHOOTING.md
+
+Document local setup, environment variables, database setup, worker setup, storage setup, provider setup, and production deployment.
+
+81. ENVIRONMENT VARIABLES
+
+Generate .env.example.
+
+Example categories:
+- DATABASE_URL
+- REDIS_URL
+- APP_URL
+- SESSION_SECRET
+- STORAGE_PROVIDER
+- STORAGE_BUCKET
+- STORAGE_ENDPOINT
+- STORAGE_ACCESS_KEY
+- STORAGE_SECRET_KEY
+- DOWNLOAD_MAX_SIZE
+- DOWNLOAD_TIMEOUT
+- WORKER_CONCURRENCY
+
+Do not place actual secrets inside the repository.
+
+82. DOCKER
+
+Provide:
+- Dockerfile
+- docker-compose.yml
+- worker configuration
+- environment example
+- health checks
+
+Services may include web, api, worker, postgres, and redis.
+
+Keep infrastructure modular.
+
+83. HEALTH ENDPOINTS
+
+Implement:
+- GET /health
+- GET /health/db
+- GET /health/redis
+- GET /health/storage
+- GET /health/providers
+
+Responses should identify whether dependencies are healthy without exposing secrets.
+
+84. SECURITY TESTING
+
+Test:
+- SSRF
+- redirect attacks
+- path traversal
+- SQL injection
+- XSS
+- CSRF
+- authentication bypass
+- authorization bypass
+- rate-limit bypass
+- oversized requests
+- malformed URLs
+- malicious filenames
+- provider credential leakage
+
+Do not test against third-party systems without authorization. Use local test fixtures.
+
+85. UNIT TESTS
+
+Test:
+- URL parser
+- platform detector
+- provider matcher
+- provider router
+- fallback logic
+- metadata validation
+- format parser
+- download job state
+- progress calculation
+- file naming
+- storage adapter
+- rate limiter
+- permission checks
+
+86. INTEGRATION TESTS
+
+Test:
+- URL → provider → metadata
+- URL → direct media → download
+- provider failure → fallback
+- rate limit → fallback
+- worker → storage
+- download cancellation
+- resume
+- history creation
+- file cleanup
+
+87. END-TO-END TEST
+
+Create a local test source.
+
+Test:
+- Paste test URL
+- Analyze
+- View metadata
+- Choose format
+- Start download
+- Observe real progress
+- Complete download
+- Verify file
+- View history
+
+The entire test should work without external commercial services.
+
+88. ERROR RECOVERY TESTS
+
+Simulate:
+- connection drop
+- server timeout
+- provider timeout
+- provider 500
+- provider rate limit
+- storage failure
+- worker restart
+- browser refresh
+- duplicate job
+- cancelled job
+
+Verify jobs recover safely.
+
+89. DUPLICATE DOWNLOAD DETECTION
+
+Detect duplicates using combinations of canonical URL, content identifier, provider, format, and quality.
+
+Offer:
+- Already downloaded
+- Download again
+- Open previous file
+
+90. SMART PROVIDER ROUTING
+
+Create a Provider Brain.
+
+Pseudo-logic:
+receive URL
+→ detect capabilities
+→ find compatible providers
+→ remove disabled providers
+→ remove unhealthy providers
+→ remove unsupported providers
+→ sort by intelligent score
+→ try primary
+→ validate result
+→ fallback when appropriate
+→ return verified result
+
+A provider must not be considered successful merely because its HTTP request returned 200.
+
+91. RESULT VALIDATION
+
+Before returning a media result, validate:
+- valid URL
+- expected content type
+- expected metadata schema
+- media availability
+- file accessibility
+- format validity
+- provider response integrity
+
+Reject malformed/fake provider responses.
+
+92. SECURITY OF REMOTE CONTENT
+
+Treat all remote responses as untrusted.
+
+Protect against malicious headers, unexpected content types, HTML disguised as media, oversized redirects, resource exhaustion, and unsafe archive handling if ever added.
+
+93. PRIVACY
+
+Minimize stored data.
+
+Allow administrators to configure retention.
+
+Clearly separate source URL, metadata, download history, provider logs, and security logs.
+
+Do not collect unnecessary personal information.
+
+94. ADMIN AUDIT LOG
+
+Record sensitive administrative actions:
+- provider added
+- provider removed
+- credential changed
+- provider enabled
+- provider disabled
+- rate limit changed
+- storage setting changed
+- admin login
+- permission change
+
+Do not store secret values themselves.
+
+95. USER-FACING STATUS MESSAGES
+
+Examples:
+- Analyzing URL...
+- Detecting source...
+- Selecting provider...
+- Resolving media...
+- Preparing download...
+- Downloading...
+- Finalizing file...
+- Download complete.
+
+Failure:
+"We could not resolve this source. The available providers either do not support it or the source is unavailable."
+
+Do not blame users incorrectly.
+
+96. DOWNLOAD PAGE
+
+Create a dedicated download page showing:
+- Current job
+- Thumbnail
+- Title
+- Provider
+- Format
+- Quality
+- Progress
+- Speed
+- ETA
+- Downloaded bytes
+- Total bytes
+- Pause
+- Resume
+- Cancel
+- Retry
+
+97. NOTIFICATION SYSTEM
+
+Support browser notifications where permitted.
+
+Events:
+- Download started
+- Download completed
+- Download failed
+- Download cancelled
+
+Never request notification permission repeatedly.
+
+98. OPTIONAL PWA
+
+Make the web application installable as a PWA where compatible.
+
+Include manifest, service worker, icons, offline shell, and install prompt.
+
+Do not pretend that offline mode can download online media without connectivity.
+
+99. INTERNATIONALIZATION
+
+Make text translation-ready.
+
+Start with English and Hindi.
+
+Keep UI strings in localization files.
+
+100. NO VENDOR LOCK-IN
+
+The system must not depend on one provider.
+
+The user/admin must be able to configure Provider A only, Provider B only, A+B, A+B+C, or all compatible enabled providers.
+
+101. PROVIDER FALLBACK EXAMPLE
+
+User URL
+→ Detect Platform
+→ Compatible Providers: A, B, C, D
+→ A rate limited
+→ B timeout
+→ C success
+→ Validate C response
+→ Return media formats
+
+102. PROVIDER API USAGE
+
+Track provider usage:
+- requests today
+- requests this month
+- successes
+- failures
+- rate-limit responses
+- average latency
+
+Notify administrator when configured thresholds are reached.
+
+103. PROVIDER COST AWARENESS
+
+Each provider can be marked:
+- FREE
+- FREE_TIER
+- SELF_HOSTED
+- PAID
+- UNKNOWN
+
+Do not automatically assume "free forever."
+
+Display provider documentation and configured limits to administrators.
+
+104. AUTOMATIC HEALTH DISABLING
+
+If failure rate exceeds a threshold, temporarily mark provider DEGRADED.
+
+If repeated failures continue, mark TEMPORARILY_DISABLED.
+
+Automatically retest after cooldown.
+
+Allow manual override.
+
+105. PROVIDER VERSIONING
+
+Track provider version, adapter version, API version, and last verification.
+
+When an API changes, administrator can identify which adapter is affected.
+
+106. PROVIDER DEVELOPMENT DOCUMENTATION
+
+A developer adding a provider should only need to implement:
+- supports()
+- resolveMetadata()
+- resolveMedia()
+- healthCheck()
+
+where applicable.
+
+Provide a complete provider example.
+
+107. SOURCE COMPATIBILITY ENGINE
+
+Return structured compatibility:
+- SUPPORTED
+- PARTIAL
+- METADATA_ONLY
+- DIRECT_MEDIA_ONLY
+- UNSUPPORTED
+- TEMPORARILY_UNAVAILABLE
+- RESTRICTED
+
+Only show capabilities actually tested.
+
+108. DO NOT FAKE UNIVERSALITY
+
+Never write:
+- 100% guaranteed
+- every website
+- every video
+- bypass everything
+- no restrictions
+
+unless a specific claim is objectively verified.
+
+Instead use:
+- Supported sources
+- Supported formats
+- Available providers
+
+109. PROJECT STRUCTURE
+
+Use a clean structure similar to:
+
+cyrus-universal-media-hub/
+  apps/
+    web/
+    api/
+    worker/
+  packages/
+    core/
+    provider-sdk/
+    provider-registry/
+    url-engine/
+    media-engine/
+    download-engine/
+    storage/
+    database/
+    security/
+    shared-types/
+  providers/
+    official/
+    open/
+    public/
+    direct/
+    community/
+  database/
+    migrations/
+    seeds/
+  tests/
+  docs/
+  scripts/
+  docker/
+  .env.example
+  README.md
+  package.json
+
+Adapt the exact structure to the chosen framework, but preserve modular separation.
+
+110. CORE ENGINE SEPARATION
+
+Do NOT combine everything into one file.
+
+Separate:
+- URL detection
+- Provider selection
+- Metadata resolution
+- Media resolution
+- Download execution
+- Storage
+- Authentication
+- Rate limiting
+- Logging
+- Admin system
+
+111. TYPE SAFETY
+
+Use strict TypeScript.
+
+Enable strict: true.
+
+Avoid any unless absolutely necessary and documented.
+
+Create shared types for Provider, Metadata, MediaFormat, DownloadJob, StorageFile, ProviderHealth, and ErrorResponse.
+
+112. API VALIDATION
+
+Validate all external input using a schema-validation library or equivalent.
+
+Validate URLs, query parameters, body, provider configuration, API keys, admin settings, pagination, and format selections.
+
+113. PAGINATION
+
+For history, users, providers, logs, jobs, and provider usage implement limit/cursor/page with sensible maximums.
+
+114. SEARCH
+
+Admin should be able to search providers, jobs, users, logs, and history using indexed fields.
+
+115. FILTERING
+
+Support status, provider, platform, date range, quality, format, and user where applicable.
+
+116. FILE DELIVERY
+
+Prefer temporary signed URLs when the storage backend supports them.
+
+Signed URLs should have expiration.
+
+Do not expose internal storage paths unnecessarily.
+
+117. STORAGE SECURITY
+
+Prevent path traversal, arbitrary file access, cross-user file access, filename injection, and unsigned permanent public links.
+
+118. CDN SUPPORT
+
+Optional configurable CDN layer.
+
+Do not require a CDN.
+
+Architecture:
+Application → Storage → Optional CDN → User
+
+119. THUMBNAIL CACHING
+
+Cache thumbnails only when permitted.
+
+Use resized/optimized versions where appropriate.
+
+120. ADMIN SYSTEM SETTINGS
+
+Create forms for:
+- maximum download size
+- maximum active downloads
+- maximum anonymous jobs
+- provider timeout
+- retry count
+- history retention
+- file retention
+- worker concurrency
+- default format
+- default quality
+- logging level
+- maintenance mode
+
+121. MAINTENANCE MODE
+
+Admin can enable maintenance mode.
+
+Users see:
+"The downloader is temporarily under maintenance."
+
+Administrators can still access the panel.
+
+122. BACKUP
+
+Document backups for PostgreSQL, provider configuration, encrypted provider credentials, and system settings.
+
+Do not backup temporary media unnecessarily.
+
+123. MIGRATIONS
+
+Every schema change must use migrations.
+
+Never require users to manually edit production database tables.
+
+124. SEED DATA
+
+Provide only safe sample data, such as a sample direct media provider and mock provider for tests.
+
+Do not embed real third-party API keys.
+
+125. DEVELOPMENT MODE
+
+Development mode may include mock providers, test URLs, synthetic download files, and debug logs.
+
+These must be clearly separated from production.
+
+126. PRODUCTION MODE
+
+Production must:
+- disable mocks
+- require secure secrets
+- require authentication for admin
+- enable rate limits
+- enable security headers
+- enable secure cookies
+- enable database validation
+- enable provider health checks
+
+127. SECURITY HEADERS
+
+Configure suitable headers such as Content-Security-Policy, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, and Strict-Transport-Security using settings appropriate to deployment.
+
+128. CORS
+
+Do not use Access-Control-Allow-Origin: * for authenticated APIs unless there is a specific reason.
+
+Configure allowed origins.
+
+129. CSRF
+
+Protect cookie-authenticated state-changing requests.
+
+130. PASSWORD SECURITY
+
+Never store plain passwords.
+
+Use a modern password-hashing algorithm.
+
+Implement password reset, session invalidation, secure cookies, and login rate limits.
+
+131. ADMIN PROTECTION
+
+Require stronger security for administrators.
+
+Implement admin route protection, server-side role validation, audit logs, session expiration, and optional 2FA-ready architecture.
+
+132. FRONTEND STATE MANAGEMENT
+
+Use a predictable client-state system.
+
+Track current URL, analysis state, result, download jobs, provider information, errors, and user session.
+
+Avoid excessive global state.
+
+133. UX STATES
+
+Every screen must support Loading, Success, Empty, Error, Retry, and Offline/network failure.
+
+No blank screens.
+
+134. URL ANALYSIS STATES
+
+IDLE
+VALIDATING
+DETECTING
+RESOLVING
+READY
+FAILED
+
+135. DOWNLOAD STATES
+
+QUEUED
+STARTING
+DOWNLOADING
+PAUSED
+RESUMING
+FINALIZING
+COMPLETED
+FAILED
+CANCELLED
+
+136. SPEED CALCULATION
+
+Calculate real speed from byte deltas over time.
+
+Do not calculate speed from percentage alone.
+
+137. ETA CALCULATION
+
+Only show ETA when total size is known and speed is measurable.
+
+Otherwise show ETA unavailable.
+
+138. DOWNLOAD COMPLETION
+
+Before marking complete:
+- verify file exists
+- verify expected size where possible
+- verify stream finished
+- close storage handles
+- update database
+- generate delivery URL
+
+139. INTERRUPTED JOBS
+
+If worker crashes, job should not remain permanently stuck.
+
+Implement stale-job detection and recover, resume, retry, or mark failed.
+
+140. USER EXPERIENCE FOR FAILURES
+
+Do not expose technical stack traces.
+
+Example:
+"Download failed. The selected provider could not resolve this media. Try another available format or retry later."
+
+Admin logs contain technical diagnostics.
+
+141. TELEMETRY
+
+Collect only necessary operational metrics.
+
+Allow telemetry configuration.
+
+Respect privacy requirements.
+
+142. LEGAL/COMPLIANCE INFORMATION
+
+Include an appropriate page explaining:
+
+Users are responsible for ensuring they have permission to download content. The service does not circumvent DRM, private access controls, CAPTCHA, paywalls, or authentication. Availability depends on source/provider capabilities.
+
+143. SUPPORTED MEDIA TYPES
+
+Use an extensible MIME registry.
+
+Do not hardcode only a tiny list.
+
+Make it configuration-driven.
+
+144. SOURCE IDENTIFIER SYSTEM
+
+Create normalized identifiers:
+- platform
+- content_id
+- canonical_url
+- provider
+
+This allows duplicate detection and caching.
+
+145. PLATFORM DOMAIN ALIASES
+
+Support multiple legitimate domains for one platform.
+
+Do not assume subdomains are safe automatically.
+
+146. PROVIDER PRIORITY
+
+Allow 0–100 priority.
+
+Higher priority means preferred, but health/capability still matter.
+
+147. PROVIDER CIRCUIT BREAKER
+
+Implement circuit breaking:
+
+Repeated failures
+→ OPEN CIRCUIT
+→ Temporarily skip provider
+→ Cooldown
+→ Health test
+→ CLOSED
+
+148. PROVIDER RATE LIMIT AWARENESS
+
+Provider adapter may return retryAfter, remaining, and resetAt.
+
+Use that information for routing.
+
+149. PROVIDER RESPONSE NORMALIZATION
+
+Every provider response should be normalized into your own schema.
+
+Provider-specific differences must not leak into the frontend.
+
+150. FINAL QUALITY REQUIREMENT
+
+Do not stop after generating the interface.
+
+You must implement:
+- Frontend
+- Backend
+- Database
+- Workers
+- Provider SDK
+- Provider registry
+- Downloader
+- Storage
+- Authentication
+- Admin panel
+- Health system
+- Rate limiting
+- Logging
+- Testing
+- Documentation
+- Deployment configuration
+
+Everything must connect end-to-end.
+
+151. IMPLEMENTATION ORDER
+
+Phase 1 — Foundation:
+repository, TypeScript, frontend, backend, database, environment configuration, logging, error system.
+
+Phase 2 — URL Engine:
+URL validation, normalization, direct media detection, platform detection, SSRF protection.
+
+Phase 3 — Native Download Engine:
+HTTP downloads, streaming, range requests, resume, progress, storage, cleanup.
+
+Phase 4 — Provider SDK:
+provider interface, registry, router, health system, fallback, provider configuration.
+
+Phase 5 — Initial Providers:
+Implement the highest-value legitimate providers first, including direct media, official APIs, public/open media sources, and self-hosted/open providers.
+
+Do not create fake providers simply to increase the provider count.
+
+Phase 6 — Admin Dashboard:
+provider management, keys, health, usage, logs, settings.
+
+Phase 7 — User System:
+auth, history, dashboard, settings.
+
+Phase 8 — Queue and Workers:
+background jobs, parallel downloads, recovery, retry.
+
+Phase 9 — Testing:
+unit tests, integration tests, security tests, end-to-end tests, mobile tests.
+
+Phase 10 — Production:
+Docker, database migrations, deployment instructions, environment configuration, health checks, monitoring, backup documentation.
+
+152. ACCEPTANCE TEST
+
+Test A — Direct MP4:
+Public test MP4 URL → Analyze → Detect video → Show metadata → Download → Verify file.
+
+Test B — Metadata Provider:
+Valid supported URL → Provider selected → Metadata returned → Formats displayed.
+
+Test C — Provider Failure:
+Provider A fails → Provider B selected → Result succeeds.
+
+Test D — Rate Limit:
+Provider A rate limited → Router skips/defers A → Provider B selected.
+
+Test E — Large File:
+Large test file → Streaming → Genuine progress → Storage → Completion.
+
+Test F — Interrupted Download:
+Download → network interruption → recovery/resume if supported → completion.
+
+Test G — Unauthorized Source:
+Restricted/private/DRM source → reject appropriately → no bypass attempt.
+
+Test H — SSRF:
+Internal IP URL → blocked.
+
+Test I — Mobile:
+Android browser → paste URL → analyze → select format → download.
+
+153. FINAL DELIVERABLES
+
+The final project must contain:
+- Complete source code
+- Complete frontend
+- Complete backend
+- Worker service
+- Database schema
+- Migrations
+- Provider SDK
+- Provider registry
+- Download engine
+- Storage abstraction
+- Authentication
+- Admin dashboard
+- User dashboard
+- Security layer
+- Rate limiter
+- Logging
+- Tests
+- Docker configuration
+- .env.example
+- README
+- Deployment documentation
+- Provider developer documentation
+- API documentation
+- Troubleshooting documentation
+
+154. CODING RULES FOR THE AI
+
+1. Never skip backend implementation.
+2. Never use fake data in production paths.
+3. Never create dead buttons.
+4. Never hide errors.
+5. Never expose secrets.
+6. Never hardcode API keys.
+7. Never assume every API is a downloader.
+8. Never advertise unsupported platforms.
+9. Never bypass access controls.
+10. Never use fake progress.
+11. Never store huge files in memory.
+12. Never trust user-provided URLs.
+13. Never trust remote responses.
+14. Never expose another user's data.
+15. Never write everything into one giant file.
+16. Use reusable components.
+17. Use strict typing.
+18. Use migrations.
+19. Add tests.
+20. Document every provider integration.
+
+155. MOST IMPORTANT ARCHITECTURAL PRINCIPLE
+
+The application is NOT one downloader script.
+
+It is:
+
+CYRUS UNIVERSAL MEDIA HUB
+- Web UI
+- URL Engine
+- Provider Intelligence
+- Official Providers
+- Open/Public Providers
+- Direct Media Engine
+- Media Resolver
+- Download Queue
+- Worker Engine
+- Secure Storage / Delivery
+
+This architecture must allow the project to grow from 1 provider to 10, 50, 100, or 200+ providers without rewriting the core downloader.
+
+156. FINAL INSTRUCTION TO THE CODING AI
+
+Build Cyrus Universal Media Hub as a genuinely connected production application.
+
+Start with the repository structure and working foundation.
+
+Then implement the URL engine.
+
+Then implement the native direct-download engine.
+
+Then implement the provider SDK and intelligent provider registry.
+
+Then add legitimate provider integrations.
+
+Then implement fallback routing.
+
+Then implement real download jobs and workers.
+
+Then implement authentication and history.
+
+Then implement the admin provider/key/health dashboard.
+
+Then implement security, testing, monitoring, documentation, and deployment.
+
+At every stage, run tests and fix errors before continuing.
+
+When an integration is impossible because the source does not expose a legitimate API or accessible media resource, do not fake the integration. Build the provider interface so it can be added later when a valid implementation becomes available.
+
+The final result must feel like one unified professional media platform rather than a collection of unrelated APIs.
+
+ONE APP
+ONE URL INPUT
+ONE UNIVERSAL MEDIA ENGINE
+MANY LEGITIMATE PROVIDERS
+INTELLIGENT FALLBACK
+REAL DOWNLOADS
+REAL PROGRESS
+REAL STORAGE
+REAL SECURITY
+REAL ADMIN CONTROL
+
+Project name:
+CYRUS UNIVERSAL MEDIA HUB
+
+Powered by CyrusLinksHub
